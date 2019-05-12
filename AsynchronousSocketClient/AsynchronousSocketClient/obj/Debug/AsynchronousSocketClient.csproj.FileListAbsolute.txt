@@ -1,0 +1,20 @@
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\bin\Debug\AsynchronousSocketClient.exe.config
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\bin\Debug\AsynchronousSocketClient.exe
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\bin\Debug\AsynchronousSocketClient.pdb
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.csprojAssemblyReference.cache
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.Form1.resources
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.Properties.Resources.resources
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.csproj.GenerateResource.cache
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.csproj.CoreCompileInputs.cache
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.exe
+C:\Users\WindowsHyun\Desktop\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.pdb
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\bin\Debug\AsynchronousSocketClient.exe.config
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\bin\Debug\AsynchronousSocketClient.exe
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\bin\Debug\AsynchronousSocketClient.pdb
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.csprojAssemblyReference.cache
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.Form1.resources
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.Properties.Resources.resources
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.csproj.GenerateResource.cache
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.csproj.CoreCompileInputs.cache
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.exe
+E:\★텍스트자료\OneDrive\ProgramFile Data\2019년도 프로그램 작업\C# 비동기 통신\AsynchronousSocketClient\AsynchronousSocketClient\obj\Debug\AsynchronousSocketClient.pdb

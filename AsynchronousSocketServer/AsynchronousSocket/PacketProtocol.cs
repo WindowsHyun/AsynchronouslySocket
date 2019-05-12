@@ -11,6 +11,11 @@ namespace publicPacketProtocol {
   public class PacketProtocol {
 
     [Serializable]
+    public enum packetType {
+      char_pos = 0
+    }
+
+    [Serializable]
     public class Packet {
       public int packet_Type;
 

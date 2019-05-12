@@ -19,172 +19,56 @@ namespace AsynchronousSocket {
 
   public partial class Form1 : Form {
 
-    public class StateObject {
-      public Socket workSocket = null;
-      public const int BufferSize = 1024;
-      public byte[] buffer = new byte[BufferSize];
-      public StringBuilder sb = new StringBuilder();
+    AsynchronousSocketServer asyncServer = new AsynchronousSocketServer();
+
+    delegate void delegateProcessPacket(int packet_Type, byte[] buffer);
+    // delegate 처리 함수
+    public void DelegateProcessPacket(int packet_Type, byte[] buffer) {
+      if (InvokeRequired) {
+        delegateProcessPacket c = new delegateProcessPacket(DelegateProcessPacket);
+        Invoke(c, new object[] { packet_Type, buffer });
+      } else {
+        ProcessPacket(packet_Type, buffer);
+      }
     }
-
-    // Thread signal.
-    public static ManualResetEvent allDone = new ManualResetEvent(false);
-    // Golobal Sockeet define for g_listener
-    public static Socket g_listener = null;
-    private static readonly int Port = 11000;
-    private readonly static IPAddress iPAddress = IPAddress.Parse("127.0.0.1");
-
-    Thread ServerThread;
 
     public Form1() {
       InitializeComponent();
     }
 
-    public void setSocket(Socket sock) {
-      g_listener = sock;
-    }
-
-    private void Server_Start() {
-      IPEndPoint localEndPoint = new IPEndPoint(iPAddress, Port);
-
-      // Create a TCP/IP socket.  
-      g_listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-      // Bind the socket to the local endpoint and listen for incoming connections.  
-      try {
-        g_listener.Bind(localEndPoint);
-        g_listener.Listen(100);
-
-        while (true) {
-          // Set the event to nonsignaled state.  
-          allDone.Reset();
-
-          // Start an asynchronous socket to listen for connections.  
-          Console.WriteLine("Waiting for a connection...");
-          g_listener.BeginAccept(
-              new AsyncCallback(AcceptCallback),
-              g_listener);
-
-          // Wait until a connection is made before continuing.  
-          allDone.WaitOne();
-        }
-
-      } catch (Exception e) {
-        Console.WriteLine(e.ToString());
-      }
-
-      Console.WriteLine("\nPress ENTER to continue...");
-      Console.Read();
-    }
-
-    public static void AcceptCallback(IAsyncResult ar) {
-      // Signal the main thread to continue.  
-      allDone.Set();
-
-      // Get the socket that handles the client request.  
-      g_listener = (Socket)ar.AsyncState;
-      Socket handler = g_listener.EndAccept(ar);
-      g_listener = handler;
-      // Create the state object.  
-      StateObject state = new StateObject();
-      state.workSocket = handler;
-      handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-          new AsyncCallback(ReadCallback), state);
-    }
-
-    public static void ReadCallback(IAsyncResult ar) {
-      String content = String.Empty;
-
-      // Retrieve the state object and the handler socket  
-      // from the asynchronous state object.  
-      StateObject state = (StateObject)ar.AsyncState;
-      Socket handler = state.workSocket;
-
-      // Read data from the client socket.   
-      int bytesRead = handler.EndReceive(ar);
-
-      if (bytesRead > 0) {
-        // There  might be more data, so store the data received so far.  
-        state.sb.Append(Encoding.ASCII.GetString(
-            state.buffer, 0, bytesRead));
-
-        // Check for end-of-file tag. If it is not there, read   
-        // more data.  
-        content = state.sb.ToString();
-        if (content.IndexOf("<EOF>") > -1) {
-          // All the data has been read from the   
-          // client. Display it on the console.  
-          Console.WriteLine("Read {0} bytes from socket. \n Data : {1}", content.Length, content);
-          // Echo the data back to the client.  
-          //Send(handler, content);
-
-          handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-          new AsyncCallback(ReadCallback), state);
-          state.workSocket = handler;
-        } else {
-          // Not all data received. Get more.  
-          handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-          new AsyncCallback(ReadCallback), state);
-        }
-      }
-    }
-
-    private static void Send(Socket handler, String data) {
-      // Convert the string data to byte data using ASCII encoding.  
-      byte[] byteData = Encoding.ASCII.GetBytes(data);
-
-      // Begin sending the data to the remote device.  
-      handler.BeginSend(byteData, 0, byteData.Length, 0,
-          new AsyncCallback(SendCallback), handler);
-    }
-
-    private static void Send(Socket handler, Byte[] data) {
-      // Begin sending the data to the remote device.  
-      handler.BeginSend(data, 0, data.Length, 0,
-          new AsyncCallback(SendCallback), handler);
-    }
-
-    private static void SendCallback(IAsyncResult ar) {
-      try {
-        // Retrieve the socket from the state object.  
-        Socket handler = (Socket)ar.AsyncState;
-
-        // Complete sending the data to the remote device.  
-        int bytesSent = handler.EndSend(ar);
-        Console.WriteLine("Sent {0} bytes to client.", bytesSent);
-
-
-        // Create the state object.  
-        StateObject state = new StateObject();
-        state.workSocket = handler;
-        handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-            new AsyncCallback(ReadCallback), state);
-
-        //handler.Shutdown(SocketShutdown.Both);
-        //handler.Close();
-
-      } catch (Exception e) {
-        Console.WriteLine(e.ToString());
-      }
-    }
-
     private void Form1_Load(object sender, EventArgs e) {
-      ServerThread = new Thread(new ThreadStart(Server_Start));
-      ServerThread.Start();
+      asyncServer.StartServer();
+      // 서버에서 받은 Packet을 Form에서 읽어서 처리 하기 위하여 Delegate를 설정한다.
+      asyncServer.ServerGetPacket += DelegateProcessPacket;
 
     }
 
-    private void button1_Click(object sender, EventArgs e) {
+    private void ProcessPacket(int packet_Type, byte[] buffer) {
 
+      switch (packet_Type) {
+        case (int)packetType.char_pos:
+          Char_Pos receiveclass = (Char_Pos)Packet.Deserialize(buffer);
+          Console.WriteLine(receiveclass.x + ", " + receiveclass.y + ", " + receiveclass.z);
+          listBox1.Items.Add("[Recv : packetType.char_pos ] " + receiveclass.x + ", " + receiveclass.y + ", " + receiveclass.z);
+          break;
+
+        case 2:
+          break;
+
+      }
+
+    }
+
+
+    private void button1_Click_1(object sender, EventArgs e) {
       Char_Pos char_Pos = new Char_Pos();
-      char_Pos.x = 1;
-      char_Pos.y = 1;
-      char_Pos.z = 1;
-      char_Pos.packet_Type = 1;
+      char_Pos.x = Int32.Parse(textBox1.Text);
+      char_Pos.y = Int32.Parse(textBox2.Text);
+      char_Pos.z = Int32.Parse(textBox3.Text);
+      char_Pos.packet_Type = (int)packetType.char_pos;
 
-      Send(g_listener,  Packet.Serialize(char_Pos));
-
+      asyncServer.Send(asyncServer.ServerSock, Packet.Serialize(char_Pos));
     }
-
 
   }
 }

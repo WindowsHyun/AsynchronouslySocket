@@ -28,6 +28,7 @@
       this.textBox3 = new System.Windows.Forms.TextBox();
       this.textBox2 = new System.Windows.Forms.TextBox();
       this.textBox1 = new System.Windows.Forms.TextBox();
+      this.UserNo = new System.Windows.Forms.TextBox();
       this.SuspendLayout();
       // 
       // listBox1
@@ -41,9 +42,9 @@
       // 
       // button1
       // 
-      this.button1.Location = new System.Drawing.Point(12, 34);
+      this.button1.Location = new System.Drawing.Point(12, 61);
       this.button1.Name = "button1";
-      this.button1.Size = new System.Drawing.Size(139, 21);
+      this.button1.Size = new System.Drawing.Size(141, 21);
       this.button1.TabIndex = 9;
       this.button1.Text = "Send";
       this.button1.UseVisualStyleBackColor = true;
@@ -76,11 +77,21 @@
       this.textBox1.Text = "0";
       this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
       // 
+      // UserNo
+      // 
+      this.UserNo.Location = new System.Drawing.Point(12, 34);
+      this.UserNo.Name = "UserNo";
+      this.UserNo.Size = new System.Drawing.Size(141, 21);
+      this.UserNo.TabIndex = 11;
+      this.UserNo.Text = "0";
+      this.UserNo.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+      // 
       // Form1
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(488, 268);
+      this.Controls.Add(this.UserNo);
       this.Controls.Add(this.listBox1);
       this.Controls.Add(this.button1);
       this.Controls.Add(this.textBox3);
@@ -101,6 +112,7 @@
     private System.Windows.Forms.TextBox textBox3;
     private System.Windows.Forms.TextBox textBox2;
     private System.Windows.Forms.TextBox textBox1;
+    private System.Windows.Forms.TextBox UserNo;
   }
 }
 

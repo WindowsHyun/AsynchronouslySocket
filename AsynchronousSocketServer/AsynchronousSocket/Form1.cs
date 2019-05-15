@@ -21,14 +21,14 @@ namespace AsynchronousSocket {
 
     AsynchronousSocketServer asyncServer = new AsynchronousSocketServer();
 
-    delegate void delegateProcessPacket(int packet_Type, byte[] buffer);
+    delegate void delegateProcessPacket(int packet_Type, byte[] buffer, int userNo);
     // delegate 처리 함수
-    public void DelegateProcessPacket(int packet_Type, byte[] buffer) {
+    public void DelegateProcessPacket(int packet_Type, byte[] buffer, int userNo) {
       if (InvokeRequired) {
         delegateProcessPacket c = new delegateProcessPacket(DelegateProcessPacket);
-        Invoke(c, new object[] { packet_Type, buffer });
+        Invoke(c, new object[] { packet_Type, buffer, userNo });
       } else {
-        ProcessPacket(packet_Type, buffer);
+        ProcessPacket(packet_Type, buffer, userNo);
       }
     }
 
@@ -43,13 +43,24 @@ namespace AsynchronousSocket {
 
     }
 
-    private void ProcessPacket(int packet_Type, byte[] buffer) {
+    private void ProcessPacket(int packet_Type, byte[] buffer, int userNO) {
 
       switch (packet_Type) {
         case (int)packetType.char_pos:
+
+          // Char_Pos 를 직렬화 하여 가져온다.
           Char_Pos receiveclass = (Char_Pos)Packet.Deserialize(buffer);
           Console.WriteLine(receiveclass.x + ", " + receiveclass.y + ", " + receiveclass.z);
-          listBox1.Items.Add("[Recv : packetType.char_pos ] " + receiveclass.x + ", " + receiveclass.y + ", " + receiveclass.z);
+
+          // 리스트 박스에 해당 내용을 추가 한다.
+          listBox1.Items.Add("(" + userNO + ")[Recv : packetType.char_pos ] " + receiveclass.x + ", " + receiveclass.y + ", " + receiveclass.z);
+
+          // server_data에 추가를 하기 위하여 iter로 가져와서 set을 시켜준다.
+          Game_ClientClass iter = asyncServer.server_data[userNO];
+          iter.set_x(receiveclass.x);
+          iter.set_y(receiveclass.y);
+          iter.set_z(receiveclass.z);
+
           break;
 
         case 2:
@@ -67,7 +78,7 @@ namespace AsynchronousSocket {
       char_Pos.z = Int32.Parse(textBox3.Text);
       char_Pos.packet_Type = (int)packetType.char_pos;
 
-      asyncServer.Send(asyncServer.ServerSock, Packet.Serialize(char_Pos));
+      asyncServer.Send(Int32.Parse(UserNo.Text.ToString()), Packet.Serialize(char_Pos));
     }
 
   }

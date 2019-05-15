@@ -17,23 +17,35 @@ namespace AsynchronousSocket {
     public const int BufferSize = 1024;
     public byte[] buffer = new byte[BufferSize];
     public StringBuilder sb = new StringBuilder();
+    public int userNo = 0;
   }
 
   public class AsynchronousSocketServer {
     // Thread signal.
     public static ManualResetEvent allDone = new ManualResetEvent(false);
-    // Golobal Sockeet define for g_listener
+
+    // 소켓 및 아이피 포트 번호 선언
     public static Socket g_listener = null;
-    public Socket ServerSock;
+    //public Socket ServerSock;
     private static readonly int Port = 11000;
     private readonly static IPAddress iPAddress = IPAddress.Parse("127.0.0.1");
 
+    // 서버를 시작할 Thread 선언
     Thread ServerThread;
 
-    public delegate void delegateProcessPacket(int packet_Type, byte[] buffer);
+    // 유저를 관리할 Dictionary 선언
+    public int userNo = 0;
+    public Dictionary<int, Game_ClientClass> server_data = new Dictionary<int, Game_ClientClass>();
+
+    public delegate void delegateProcessPacket(int packet_Type, byte[] buffer, int userNo);
     public event delegateProcessPacket ServerGetPacket;
 
     public void StartServer() {
+      // 서버 유저 정보 초기화
+      userNo = 0;
+      server_data.Clear();
+
+      // 서버 Thread 시작
       ServerThread = new Thread(new ThreadStart(Server_Start));
       ServerThread.Start();
     }
@@ -78,12 +90,16 @@ namespace AsynchronousSocket {
       g_listener = (Socket)ar.AsyncState;
       Socket handler = g_listener.EndAccept(ar);
       g_listener = handler;
-      ServerSock = handler;
-      // Create the state object.  
+
+      // 유저 정보를 Dictionary에 저장 시켜 준다.
+      ++userNo;
+      server_data.Add(userNo, new Game_ClientClass(userNo, handler, 0, 0, 0));
+
+      // StateObject를 만들어서 ReadCallback에 넘겨준다.
       StateObject state = new StateObject();
       state.workSocket = handler;
-      handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-          new AsyncCallback(ReadCallback), state);
+      state.userNo = userNo;
+      handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
     }
 
     public void ReadCallback(IAsyncResult ar) {
@@ -102,38 +118,46 @@ namespace AsynchronousSocket {
         Packet receiveclass = (Packet)Packet.Deserialize(state.buffer);
 
         // Delegate Event에 패킷 타입, 버퍼를 전달 한다.
-        ServerGetPacket?.Invoke(receiveclass.packet_Type, state.buffer);
+        ServerGetPacket?.Invoke(receiveclass.packet_Type, state.buffer, state.userNo);
 
         // Get the rest of the data.  
-        handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-            new AsyncCallback(ReadCallback), state);
+        handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
         state.workSocket = handler;
       } else {
         // Not all data received. Get more.  
-        handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-        new AsyncCallback(ReadCallback), state);
+        handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
       }
     }
 
-    public void Send(Socket handler, Byte[] data) {
-      // Begin sending the data to the remote device.  
-      handler.BeginSend(data, 0, data.Length, 0,
-          new AsyncCallback(SendCallback), handler);
+    public void Send(int userNo, Byte[] data) {
+      // userNo가 있는지 먼저 확인을 한다.
+      if (server_data.ContainsKey(userNo) == false) {
+        // userNO가 없을 경우
+        Console.WriteLine("No User {0}", userNo);
+      } else {
+
+        // 전송할 Byte[], userNO를 받아서 userNo로 Socket을 가져와 해당 유저에게 패킷을 전달 한다.
+        Socket handler = server_data[userNo].get_sock();
+
+        StateObject state = new StateObject();
+        state.workSocket = handler;
+        state.userNo = userNo;
+
+        handler.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallback), state);
+      }
     }
 
     private void SendCallback(IAsyncResult ar) {
       try {
-        // Retrieve the socket from the state object.  
-        Socket handler = (Socket)ar.AsyncState;
+
+        // stateObject 값을 읽어 온다.
+        StateObject state = (StateObject)ar.AsyncState;
+        Socket handler = state.workSocket;
 
         // Complete sending the data to the remote device.  
         int bytesSent = handler.EndSend(ar);
         Console.WriteLine("Sent {0} bytes to client.", bytesSent);
 
-
-        // Create the state object.  
-        StateObject state = new StateObject();
-        state.workSocket = handler;
         handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
 
       } catch (Exception e) {
